@@ -53,6 +53,6 @@ if ! command -v chezmoi &> /dev/null; then
 fi
 
 # Apply your dotfiles
-chezmoi init mihnearad --apply
+~/.local/bin/chezmoi init mihnearad --apply
 
 echo "✅ Done! Your Zsh + Starship environment is fully set up."
