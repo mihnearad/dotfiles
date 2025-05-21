@@ -1,0 +1,26 @@
+# Show Git branch
+parse_git_branch() {
+  git rev-parse --is-inside-work-tree &>/dev/null || return
+  local git_branch
+  git_branch=$(git symbolic-ref --short HEAD 2>/dev/null || git describe --tags --exact-match>
+  echo " [ ^g^s $git_branch]"
+}
+
+# Show Python virtual environment
+parse_venv() {
+  [ -n "$VIRTUAL_ENV" ] && echo " [ ^=^p^m $(basename "$VIRTUAL_ENV")]"
+}
+
+# Tab completion enhancements
+bind 'set show-all-if-ambiguous on'
+bind 'TAB:menu-complete'
+bind 'set completion-ignore-case on'
+bind 'set menu-complete-display-prefix on'
+
+if [ -f /etc/bash_completion ]; then
+   . /etc/bash_completion
+fi
+
+
+# Final prompt style
+PS1='\n\[\e[32m\]\u\[\e[0m\]@\[\e[31m\]\h\[\e[0m\] \[\e[33m\]\w\[\e[0m\]$(parse_git_branch)$(>'
