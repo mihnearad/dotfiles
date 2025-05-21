@@ -2,13 +2,13 @@
 
 set -e
 
-echo "🛠️ Installing Zsh and tools on Ubuntu/Debian..."
+echo "🛠️ Installing Zsh + Oh My Zsh + Starship + chezmoi..."
 
-# Install core tools
+# Install base packages
 sudo apt update
 sudo apt install -y zsh git curl wget
 
-# Install Starship (prompt)
+# Install Starship
 if ! command -v starship &> /dev/null; then
   curl -sS https://starship.rs/install.sh | sh -s -- -y
 fi
@@ -19,10 +19,10 @@ if [ ! -d "$HOME/.oh-my-zsh" ]; then
   sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 fi
 
-# Define plugin directory
+# Plugin path
 ZSH_CUSTOM="$HOME/.oh-my-zsh/custom"
 
-# Install zsh plugins
+# Install plugins
 [[ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]] && \
   git clone https://github.com/zsh-users/zsh-autosuggestions "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
 
@@ -38,5 +38,14 @@ if [ "$SHELL" != "$(which zsh)" ]; then
   chsh -s "$(which zsh)"
 fi
 
-echo "✨ Done! Oh My Zsh, Starship, and plugins are ready."
-echo "👉 Now run: chezmoi apply to deploy your dotfiles (zshrc, starship.toml, etc.)"
+# Install chezmoi if missing
+if ! command -v chezmoi &> /dev/null; then
+  echo "📦 Installing chezmoi..."
+  sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"
+  export PATH="$HOME/.local/bin:$PATH"
+fi
+
+# Run chezmoi to pull dotfiles and apply
+chezmoi init mihnearad --apply
+
+echo "✅ Done! Zsh, Starship, plugins, and your personal config are installed."
