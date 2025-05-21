@@ -4,11 +4,11 @@ set -e
 
 echo "🛠️ Installing Zsh and tools on Ubuntu/Debian..."
 
-# Install dependencies
+# Install core tools
 sudo apt update
 sudo apt install -y zsh git curl wget
 
-# Install Starship
+# Install Starship (prompt)
 if ! command -v starship &> /dev/null; then
   curl -sS https://starship.rs/install.sh | sh -s -- -y
 fi
@@ -19,55 +19,24 @@ if [ ! -d "$HOME/.oh-my-zsh" ]; then
   sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 fi
 
-# Install autosuggestions
+# Define plugin directory
 ZSH_CUSTOM="$HOME/.oh-my-zsh/custom"
-if [ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]; then
+
+# Install zsh plugins
+[[ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]] && \
   git clone https://github.com/zsh-users/zsh-autosuggestions "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
-fi
 
-# Install syntax highlighting
-if [ ! -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ]; then
+[[ ! -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ]] && \
   git clone https://github.com/zsh-users/zsh-syntax-highlighting "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting"
-fi
 
-echo "✨ Creating ~/.zshrc..."
+[[ ! -d "$ZSH_CUSTOM/plugins/zsh-completions" ]] && \
+  git clone https://github.com/zsh-users/zsh-completions "$ZSH_CUSTOM/plugins/zsh-completions"
 
-# Backup existing .zshrc
-cp ~/.zshrc ~/.zshrc.backup.$(date +%s) 2>/dev/null || true
-
-# Generate new .zshrc
-cat > ~/.zshrc <<EOF
-export ZSH="$HOME/.oh-my-zsh"
-ZSH_THEME="robbyrussell"
-
-plugins=(git zsh-autosuggestions zsh-syntax-highlighting)
-
-source \$ZSH/oh-my-zsh.sh
-
-# Starship prompt
-eval "\$(starship init zsh)"
-EOF
-
-# Install Starship config (optional)
-mkdir -p ~/.config
-cat > ~/.config/starship.toml <<EOF
-format = """\$directory\$git_branch\$git_status\n\$character"""
-
-[directory]
-style = "cyan bold"
-
-[git_branch]
-symbol = "🌱 "
-style = "purple"
-
-[git_status]
-style = "red"
-EOF
-
-# Set default shell to zsh
+# Set zsh as default shell
 if [ "$SHELL" != "$(which zsh)" ]; then
-  echo "🌀 Changing your default shell to zsh..."
+  echo "🔁 Setting zsh as default shell..."
   chsh -s "$(which zsh)"
 fi
 
-echo "✅ Done! Open a new terminal or run: zsh"
+echo "✨ Done! Oh My Zsh, Starship, and plugins are ready."
+echo "👉 Now run: chezmoi apply to deploy your dotfiles (zshrc, starship.toml, etc.)"
