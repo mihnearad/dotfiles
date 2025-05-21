@@ -4,9 +4,16 @@ set -e
 
 echo "🛠️ Installing Zsh + Oh My Zsh + Starship + chezmoi..."
 
+# Use sudo only if not root
+if [ "$(id -u)" -eq 0 ]; then
+  APT="apt"
+else
+  APT="sudo apt"
+fi
+
 # Install base packages
-sudo apt update
-sudo apt install -y zsh git curl wget
+$APT update
+$APT install -y zsh git curl wget
 
 # Install Starship
 if ! command -v starship &> /dev/null; then
@@ -45,7 +52,7 @@ if ! command -v chezmoi &> /dev/null; then
   export PATH="$HOME/.local/bin:$PATH"
 fi
 
-# Run chezmoi to pull dotfiles and apply
+# Apply your dotfiles
 chezmoi init mihnearad --apply
 
-echo "✅ Done! Zsh, Starship, plugins, and your personal config are installed."
+echo "✅ Done! Your Zsh + Starship environment is fully set up."
